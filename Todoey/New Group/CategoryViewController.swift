@@ -40,9 +40,6 @@ class CategoryViewController: SwipeTableViewController  {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
     
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories Added yet!"
-
-        
-        let category = categories![indexPath.row]
         
  
         return cell
@@ -105,25 +102,22 @@ class CategoryViewController: SwipeTableViewController  {
  
         tableView.reloadData()
     }
+    
+    
     // MARK: - Delete From Swipe
     override func updateModel(at indexPath: IndexPath) {
-    
-        super.updateModel(at: indexPath)
         
-    if let categoryForDeletion = self.categories?[indexPath.row] {
-                        do {
-                            try self.realm.write {
-        
-                                self.realm.delete(categoryForDeletion)
-                            }
-                        } catch {
-                            print ("Error deleting category: \(error)")
-                        }
-                    }
+        if let categoryForDeletion = self.categories?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    
+                    self.realm.delete(categoryForDeletion)
                 }
+            } catch {
+                print ("Error deleting category: \(error)")
+            }
+        }
     }
+}
 
-
-
-//}
 
