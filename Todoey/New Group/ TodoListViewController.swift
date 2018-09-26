@@ -8,9 +8,10 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
 
     var todoItems: Results<Item>?
@@ -40,14 +41,17 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
       
-        
         
         if let item = todoItems?[indexPath.row] {
            cell.textLabel?.text = item.title
             // use of ternary operator
             cell.accessoryType = item.done ? .checkmark : .none
+            cell.backgroundColor = UIColor(hexString: (selectedCategory?.colour)!)?.darken(byPercentage: CGFloat(indexPath.row)/CGFloat((todoItems?.count)!))
+       //     cell.backgroundColor = FlatSkyBlue().darken(byPercentage: CGFloat(indexPath.row)/CGFloat((todoItems?.count)!))
+            cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
+            
         } else {
             cell.textLabel?.text = "No Items Added"
         }
@@ -71,7 +75,7 @@ class TodoListViewController: UITableViewController {
             }
         }
         
-        tableView.reloadData()
+       tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -119,6 +123,21 @@ class TodoListViewController: UITableViewController {
 
         tableView.reloadData()
     }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+        if let itemForDeletion = self.todoItems?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    
+                    self.realm.delete(itemForDeletion)
+                }
+            } catch {
+                print ("Error deleting item: \(error)")
+            }
+        }
+    }
+    
 }
 // Mark: - Search bar methods
 
